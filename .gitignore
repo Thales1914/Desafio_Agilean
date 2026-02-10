@@ -1,0 +1,16 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Build outputs
+**/bin/
+**/obj/
+
+# SQLite
+*.db
+*.db-shm
+*.db-wal
+
+# Logs
+*.log
