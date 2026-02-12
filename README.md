@@ -61,10 +61,12 @@ O terminal exibira a URL (ex.: `http://localhost:5241`).
 - Listagem em cards responsivos.
 - Busca por nome, filtro por categoria e disponibilidade.
 - Ordenacao por nome, preco, estoque e mais recentes.
+- Paginacao na listagem com controle de itens por pagina.
 - Cadastro, edicao e exclusao com modais.
 - Validacoes de formulario e mensagens de erro.
 - Preview de imagem por URL.
 - Indicadores visuais de estoque baixo, sem estoque e produto inativo.
+- Dashboard com resumo de estoque e destaques de preco.
 
 ## Decisoes Tecnicas
 - Separei o frontend em `views` e `components` para manter a tela principal enxuta.
@@ -80,7 +82,7 @@ O terminal exibira a URL (ex.: `http://localhost:5241`).
 
 ## O que eu faria diferente com mais tempo
 - Criar testes automatizados (backend e frontend).
-- Implementar paginacao e dashboard (opcional do desafio).
+- Paginacao server-side e cache de resultados para listas maiores.
 - Melhorar acessibilidade dos modais (foco, ESC, ARIA completos).
 - Configurar variaveis de ambiente por perfil e CI/CD.
 

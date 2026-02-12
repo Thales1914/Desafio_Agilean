@@ -1,10 +1,13 @@
-﻿import CatalogFilters from '../components/catalog/CatalogFilters.jsx'
+﻿import CatalogDashboard from '../components/catalog/CatalogDashboard.jsx'
+import CatalogFilters from '../components/catalog/CatalogFilters.jsx'
+import CatalogPagination from '../components/catalog/CatalogPagination.jsx'
 import DeleteConfirmModal from '../components/catalog/DeleteConfirmModal.jsx'
 import ProductFormModal from '../components/catalog/ProductFormModal.jsx'
 import ProductGrid from '../components/catalog/ProductGrid.jsx'
 
 const CatalogView = ({
   products,
+  paginatedProducts,
   categories,
   search,
   category,
@@ -12,6 +15,8 @@ const CatalogView = ({
   sort,
   sortOptions,
   availabilityOptions,
+  dashboard,
+  pagination,
   isLoading,
   error,
   isFormOpen,
@@ -35,6 +40,8 @@ const CatalogView = ({
   onSubmitForm,
   onCloseDelete,
   onConfirmDelete,
+  onPageChange,
+  onPageSizeChange,
 }) => {
   const isEditing = Boolean(editingProduct)
 
@@ -67,6 +74,8 @@ const CatalogView = ({
         onSortChange={onSortChange}
       />
 
+      {!isLoading && products.length > 0 && <CatalogDashboard summary={dashboard} />}
+
       {error && <div className="status status-error">{error}</div>}
       {isLoading && <div className="status">Carregando produtos...</div>}
       {!isLoading && !error && products.length === 0 && (
@@ -74,10 +83,18 @@ const CatalogView = ({
       )}
 
       <ProductGrid
-        products={products}
+        products={paginatedProducts}
         onOpenEdit={onOpenEdit}
         onOpenDelete={onOpenDelete}
       />
+
+      {!isLoading && !error && (
+        <CatalogPagination
+          {...pagination}
+          onPageChange={onPageChange}
+          onPageSizeChange={onPageSizeChange}
+        />
+      )}
 
       <ProductFormModal
         isOpen={isFormOpen}

@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react'
+﻿import { useEffect, useMemo, useState } from 'react'
 import {
   createProduct,
   deleteProduct,
@@ -28,6 +28,8 @@ const availabilityOptions = [
 
 const getApiAvailability = (value) =>
   availabilityOptions.find((option) => option.value === value)?.api
+
+const pageSizeOptions = [6, 9, 12]
 
 const emptyForm = {
   nome: '',
@@ -99,6 +101,8 @@ export const useCatalogController = () => {
   const [products, setProducts] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState(pageSizeOptions[1])
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [editingProduct, setEditingProduct] = useState(null)
   const [formData, setFormData] = useState(emptyForm)
@@ -187,6 +191,57 @@ export const useCatalogController = () => {
       clearTimeout(handle)
     }
   }, [search, category, sort, availability])
+
+  useEffect(() => {
+    setPage(1)
+  }, [search, category, availability, sort])
+
+  const dashboard = useMemo(() => {
+    const total = products.length
+    const active = products.filter((item) => item.ativo).length
+    const lowStock = products.filter(
+      (item) => item.ativo && item.estoque > 0 && item.estoque < 10,
+    ).length
+    const outOfStock = products.filter((item) => item.estoque === 0).length
+    const totalStockValue = products.reduce(
+      (sum, item) => sum + (item.preco || 0) * (item.estoque || 0),
+      0,
+    )
+    const mostExpensive = products.reduce((current, item) => {
+      if (!current || item.preco > current.preco) return item
+      return current
+    }, null)
+    const cheapest = products.reduce((current, item) => {
+      if (!current || item.preco < current.preco) return item
+      return current
+    }, null)
+
+    return {
+      total,
+      active,
+      lowStock,
+      outOfStock,
+      totalStockValue,
+      mostExpensive,
+      cheapest,
+    }
+  }, [products])
+
+  const totalItems = products.length
+  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize))
+  const currentPage = Math.min(page, totalPages)
+
+  useEffect(() => {
+    if (page !== currentPage) {
+      setPage(currentPage)
+    }
+  }, [page, currentPage])
+
+  const startIndex = (currentPage - 1) * pageSize
+  const endIndex = startIndex + pageSize
+  const paginatedProducts = products.slice(startIndex, endIndex)
+  const rangeStart = totalItems === 0 ? 0 : startIndex + 1
+  const rangeEnd = Math.min(totalItems, endIndex)
 
   const handleOpenCreate = () => {
     setEditingProduct(null)
@@ -294,6 +349,15 @@ export const useCatalogController = () => {
     }
   }
 
+  const handlePageChange = (value) => {
+    setPage(value)
+  }
+
+  const handlePageSizeChange = (value) => {
+    setPageSize(value)
+    setPage(1)
+  }
+
   return {
     search,
     category,
@@ -303,6 +367,17 @@ export const useCatalogController = () => {
     sortOptions,
     availabilityOptions,
     products,
+    paginatedProducts,
+    dashboard,
+    pagination: {
+      page: currentPage,
+      pageSize,
+      totalPages,
+      totalItems,
+      rangeStart,
+      rangeEnd,
+      pageSizeOptions,
+    },
     isLoading,
     error,
     isFormOpen,
@@ -326,5 +401,7 @@ export const useCatalogController = () => {
     onOpenDelete: handleOpenDelete,
     onCloseDelete: handleCloseDelete,
     onConfirmDelete: handleConfirmDelete,
+    onPageChange: handlePageChange,
+    onPageSizeChange: handlePageSizeChange,
   }
 }
