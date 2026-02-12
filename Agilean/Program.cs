@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Controllers (precisa disso para mapear ProdutosController)
 builder.Services.AddControllers();
 
 // Swagger / OpenAPI
@@ -27,19 +26,15 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Swagger só em Development (padrão "bonito" de projeto)
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-//app.UseHttpsRedirection();
 
-// Aplica a policy do CORS
 app.UseCors(CorsPolicy);
 
-// Mapeia os controllers (sem isso, /api/produtos não aparece)
 app.MapControllers();
 
 app.Run();
